@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MazoBot Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .chat-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background-color: #e0e0e0;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #d4edda;
+            text-align: left;
+        }
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .chat-input button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .source-selection {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .source-selection select, .source-selection input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">MazoBot Chat</div>
+        <div class="source-selection">
+            <label for="sourceType">Selecione a fonte:</label>
+            <select id="sourceType">
+                <option value="site">Site Web</option>
+                <option value="pdf">Documento PDF</option>
+                <option value="video">Vídeo do YouTube</option>
+            </select>
+            <input type="text" id="sourceInput" placeholder="URL ou caminho do arquivo">
+            <button onclick="loadSource()">Carregar Fonte</button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <input type="text" id="userMessage" placeholder="Digite sua mensagem...">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        let currentDocument = '';
+        let currentSourceType = 'site';
+        let currentSourceInput = '';
+
+        document.getElementById('sourceType').addEventListener('change', function() {
+            currentSourceType = this.value;
+            document.getElementById('sourceInput').placeholder = 
+                currentSourceType === 'site' ? 'URL do site' :
+                currentSourceType === 'pdf' ? 'Caminho do arquivo PDF ou URL' :
+                'Endereço do vídeo';
+        });
+
+        async function loadSource() {
+            currentSourceInput = document.getElementById('sourceInput').value;
+            if (!currentSourceInput) {
+                alert('Por favor, insira a URL ou o caminho da fonte.');
+                return;
+            }
+
+            // Simulate loading the document (in a real app, this would be an API call)
+            // For now, we'll just display a message
+            addMessage('MazoBot', `Carregando ${currentSourceType} de: ${currentSourceInput}...`);
+            
+            // In a real application, you would send this to your Flask backend
+            // and get the processed document back.
+            // For this example, we'll assume the document is loaded successfully
+            // and the chat can proceed.
+            alert('Fonte carregada! Agora você pode conversar com o MazoBot.');
+            document.querySelector('.source-selection').style.display = 'none';
+            document.querySelector('.chat-input').style.display = 'flex';
+        }
+
+        async function sendMessage() {
+            const userMessage = document.getElementById('userMessage').value;
+            if (!userMessage) return;
+
+            addMessage('Você', userMessage);
+            document.getElementById('userMessage').value = '';
+
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Send message to Flask backend
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: userMessage,
+                    source_type: currentSourceType,
+                    source_input: currentSourceInput
+                })
+            });
+
+            const data = await response.json();
+            addMessage('MazoBot', data.response);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addMessage(sender, text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'Você' ? 'user-message' : 'bot-message');
+            messageDiv.textContent = `${sender}: ${text}`;
+            chatMessages.appendChild(messageDiv);
+        }
+
+        // Hide chat input until source is loaded
+        document.querySelector('.chat-input').style.display = 'none';
+    </script>
+</body>
+</html>
+
