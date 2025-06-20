@@ -9,7 +9,7 @@ from youtube_transcript_api._errors import NoTranscriptFound
 
 app = Flask(__name__, template_folder='templates')
 
-api_key = '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'
+api_key = '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'
 os.environ['GROQ_API_KEY'] = api_key
 
 # Função para gerar a resposta do bot
