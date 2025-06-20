@@ -27,8 +27,8 @@ def resposta_do_bot(mensagens, documento):
 
     try:
         # Verifica o tamanho do documento antes de enviar
-        if len(documento) > 8000:  # Limite aproximado para evitar erros
-            documento = documento[:8000] + "\n\n[Documento truncado devido ao limite de tamanho]"
+        if len(documento) > 11000:  # Limite aproximado para evitar erros
+            documento = documento[:11000] + "\n\n[Documento truncado devido ao limite de tamanho]"
 
         resposta = chain.invoke({'informacoes': documento}).content
         return resposta
