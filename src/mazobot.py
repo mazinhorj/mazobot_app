@@ -24,9 +24,23 @@ def resposta_do_bot(mensagens, documento):
     template = ChatPromptTemplate.from_messages(msg_model)
     chat = ChatGroq(model='llama-3.3-70b-versatile')
     chain = template | chat
-    resposta = chain.invoke({'informacoes': documento}).content
-    return resposta
 
+    try:
+        # Verifica o tamanho do documento antes de enviar
+        if len(documento) > 8000:  # Limite aproximado para evitar erros
+            documento = documento[:8000] + "\n\n[Documento truncado devido ao limite de tamanho]"
+
+        resposta = chain.invoke({'informacoes': documento}).content
+        return resposta
+
+    except Exception as e:
+        if "413" in str(e) or "Request too large" in str(e):
+            return "🔴 O conteúdo é muito extenso para processar. Por favor, divida em partes menores ou selecione um documento mais curto."
+        elif "rate_limit_exceeded" in str(e):
+            return "🔴 Limite de requisições excedido. Por favor, aguarde um momento e tente novamente."
+        else:
+            return f"⚠️ Ocorreu um erro ao processar sua solicitação: {str(e)}"
+        
 # Funções para resumir conteúdos de diferentes fontes
 def resumo_site(url_site):
     loader = WebBaseLoader(url_site)
