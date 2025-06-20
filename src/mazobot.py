@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-import pypdf
+from pytube import YouTube
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
@@ -8,17 +8,9 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import YoutubeLoader
 from youtube_transcript_api._errors import NoTranscriptFound
 from tempfile import NamedTemporaryFile
-# import traceback
 
-# Verifica se o pypdf está instalado
-# try:
-#     import pypdf
-# except ImportError:
-#     st.warning("O pacote pypdf não está instalado. Instalando...")
-#     import subprocess
-#     import sys
-#     subprocess.check_call([sys.executable, "-m", "pip", "install", "pypdf"])
-#     import pypdf
+
+
 
 # Configuração da API Key
 api_key = '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'
@@ -56,6 +48,9 @@ def resumo_pdf(caminho_arquivo):
 
 def resumo_video(url_video):
     try:
+        yt = YouTube(url_video)
+        if yt.length > 2160:  # 2160 segundos = 36 minutos
+            raise ValueError('O vídeo é muito longo (mais de 36 minutos). Por favor, selecione um vídeo mais curto.')
         loader = YoutubeLoader.from_youtube_url(
             url_video,
             language=['pt']
@@ -66,7 +61,7 @@ def resumo_video(url_video):
             documento += doc.page_content
         if not documento:
             raise ValueError('Nenhuma legenda encontrada para o vídeo no idioma português.')
-        return documento
+        print(documento)
     except NoTranscriptFound:
         raise ValueError('Não foi possível encontrar legendas para este vídeo no idioma português.')
     except Exception as e:
@@ -78,7 +73,7 @@ st.title("MazoBot - Assistente de Resumos")
 
 # Sidebar para seleção do tipo de fonte
 with st.sidebar:
-    st.header("Configurações")
+    st.header("Selecione sua fonte.")
     source_type = st.radio(
         "Selecione o tipo de fonte:",
         ["Texto Direto", "Site", "PDF", "Vídeo"],
