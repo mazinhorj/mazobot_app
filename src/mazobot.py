@@ -48,9 +48,6 @@ def resumo_pdf(caminho_arquivo):
 
 def resumo_video(url_video):
     try:
-        yt = YouTube(url_video)
-        if yt.length > 2160:  # 2160 segundos = 36 minutos
-            raise ValueError('O vídeo é muito longo (mais de 36 minutos). Por favor, selecione um vídeo mais curto.')
         loader = YoutubeLoader.from_youtube_url(
             url_video,
             language=['pt']
@@ -61,7 +58,7 @@ def resumo_video(url_video):
             documento += doc.page_content
         if not documento:
             raise ValueError('Nenhuma legenda encontrada para o vídeo no idioma português.')
-        print(documento)
+        return documento
     except NoTranscriptFound:
         raise ValueError('Não foi possível encontrar legendas para este vídeo no idioma português.')
     except Exception as e:
