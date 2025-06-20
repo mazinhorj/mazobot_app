@@ -1,0 +1,6 @@
+streamlit
+langchain-groq
+langchain
+youtube-transcript-api
+pypdf
+langchain-community
