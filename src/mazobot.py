@@ -16,7 +16,7 @@ except ImportError:
     st.warning("O pacote pypdf não está instalado. Instalando...")
     import subprocess
     import sys
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pypdf"])
+    subprocess.check_call([sys.executable, "sudo", "pip", "install", "pypdf"])
     import pypdf
 
 # Configuração da API Key
