@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from  pypdf import PdfReader
+
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
