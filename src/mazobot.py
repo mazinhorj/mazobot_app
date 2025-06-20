@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-
 from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
@@ -8,6 +7,17 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import YoutubeLoader
 from youtube_transcript_api._errors import NoTranscriptFound
 from tempfile import NamedTemporaryFile
+import traceback
+
+# Verifica se o pypdf está instalado
+try:
+    import pypdf
+except ImportError:
+    st.warning("O pacote pypdf não está instalado. Instalando...")
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pypdf"])
+    import pypdf
 
 # Configuração da API Key
 api_key = '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'
